@@ -808,6 +808,340 @@
     });
   });
 </script>
+<!-- ======================================================
+   BALÃO JP CARPINTARIA — MÓVEL | MINIMIZÁVEL
+   Pode arrastar, esconder e reabrir quando quiser
+====================================================== -->
+<style>
+  /* Botão flutuante — arrastável */
+  .jp-balao-wrapper {
+    position: fixed;
+    left: 15px;
+    bottom: 30px;
+    z-index: 99999;
+    cursor: grab;
+    user-select: none;
+  }
+  .jp-balao-wrapper.arrastando { cursor: grabbing; }
 
+  /* Botão circular */
+  .jp-botao-flutuante {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: #facc15;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.35);
+    transition: transform 0.2s;
+    pointer-events: none; /* Deixa arrastar pelo botão */
+  }
+  .jp-balao-wrapper:not(.arrastando) .jp-botao-flutuante:hover {
+    transform: scale(1.1);
+  }
+
+  /* Caixa de conversa */
+  .jp-caixa-chat {
+    position: absolute;
+    left: 0;
+    bottom: 65px;
+    width: 320px;
+    background: #222;
+    border-radius: 14px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+    display: none;
+    overflow: hidden;
+  }
+  .jp-caixa-chat.aberta { display: block; }
+
+  /* Cabeçalho com controles */
+  .jp-topo {
+    background: #facc15;
+    color: #000;
+    padding: 10px 12px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .jp-controles {
+    display: flex;
+    gap: 6px;
+  }
+  .jp-btn-topo {
+    background: rgba(0,0,0,0.1);
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .jp-btn-topo:hover { background: rgba(0,0,0,0.2); }
+
+  /* Área de mensagens */
+  .jp-conteudo {
+    padding: 15px;
+    max-height: 420px;
+    overflow-y: auto;
+    color: #fff;
+  }
+  .jp-saudacao {
+    background: #333;
+    padding: 10px 14px;
+    border-radius: 12px 12px 12px 4px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .jp-btn-perg {
+    width: 100%;
+    text-align: left;
+    background: #2ecc71;
+    color: #000;
+    border: none;
+    padding: 10px 12px;
+    margin: 6px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+  .jp-btn-perg:hover { background: #27ae60; }
+  .jp-resp {
+    background: #1e3a2f;
+    padding: 12px 14px;
+    border-radius: 12px 12px 4px 12px;
+    margin: 8px 0 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    border-left: 3px solid #2ecc71;
+  }
+  .jp-link-whats {
+    display: inline-block;
+    background: #25d366;
+    color: #fff !important;
+    padding: 9px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+</style>
+
+<!-- ESTRUTURA -->
+<div class="jp-balao-wrapper" id="jpBalao">
+  <!-- Botão flutuante -->
+  <button class="jp-botao-flutuante" id="jpBotao">❓</button>
+
+  <!-- Caixa de conversa -->
+  <div class="jp-caixa-chat" id="jpCaixa">
+    <div class="jp-topo">
+      <span>JP Carpintaria</span>
+      <div class="jp-controles">
+        <button class="jp-btn-topo" title="Minimizar" onclick="jpMinimizar()">−</button>
+        <button class="jp-btn-topo" title="Fechar" onclick="jpFechar()">✕</button>
+      </div>
+    </div>
+    <div class="jp-conteudo" id="jpConteudo">
+      <div class="jp-saudacao">
+        Olá! 👋 Escolha o que precisa:<br>
+        <small style="color:#aaa;">💡 Arraste o balão pra onde quiser!</small>
+      </div>
+
+      <button class="jp-btn-perg" onclick="jpResponder(1)">📋 O que vem no Kit?</button>
+      <button class="jp-btn-perg" onclick="jpResponder(2)">💰 Pagamento e cupom</button>
+      <button class="jp-btn-perg" onclick="jpResponder(3)">📩 Como recebo o arquivo?</button>
+      <button class="jp-btn-perg" onclick="jpResponder(4)">📂 Funciona no Google Sheets?</button>
+      <button class="jp-btn-perg" onclick="jpResponder(5)">🔒 Tem garantia?</button>
+      <button class="jp-btn-perg" onclick="jpResponder(6)">🎓 Mentoria e acompanhamento</button>
+      <button class="jp-btn-perg" onclick="jpResponder(7)">🤖 Ajuda com IA</button>
+      <button class="jp-btn-perg" onclick="jpResponder(8)">🌐 Criar site</button>
+      <button class="jp-btn-perg" onclick="jpResponder(9)">📊 Planilhas personalizadas</button>
+      <button class="jp-btn-perg" onclick="jpResponder(10)">💬 Falar direto com JP</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMANDOS DE FUNCIONAMENTO -->
+<script>
+const balao = document.getElementById('jpBalao');
+const botao = document.getElementById('jpBotao');
+const caixa = document.getElementById('jpCaixa');
+const conteudo = document.getElementById('jpConteudo');
+
+let arrastando = false;
+let deslocX = 0, deslocY = 0;
+
+// === ARRASTAR O BALÃO ===
+botao.addEventListener('mousedown', iniciarArrasto);
+botao.addEventListener('touchstart', iniciarArrastoTouch);
+
+document.addEventListener('mousemove', mover);
+document.addEventListener('touchmove', moverTouch, { passive: false });
+
+document.addEventListener('mouseup', pararArrasto);
+document.addEventListener('touchend', pararArrasto);
+
+function iniciarArrasto(e) {
+  arrastando = true;
+  balao.classList.add('arrastando');
+  const rect = balao.getBoundingClientRect();
+  deslocX = e.clientX - rect.left - 27;
+  deslocY = e.clientY - rect.top - 27;
+}
+
+function iniciarArrastoTouch(e) {
+  arrastando = true;
+  balao.classList.add('arrastando');
+  const rect = balao.getBoundingClientRect();
+  const toque = e.touches[0];
+  deslocX = toque.clientX - rect.left - 27;
+  deslocY = toque.clientY - rect.top - 27;
+}
+
+function mover(e) {
+  if (!arrastando) return;
+  const x = e.clientX - deslocX - 27;
+  const y = e.clientY - deslocY - 27;
+  aplicarPosicao(x, y);
+}
+
+function moverTouch(e) {
+  if (!arrastando) return;
+  e.preventDefault();
+  const toque = e.touches[0];
+  const x = toque.clientX - deslocX - 27;
+  const y = toque.clientY - deslocY - 27;
+  aplicarPosicao(x, y);
+}
+
+function aplicarPosicao(x, y) {
+  // Mantém dentro da tela
+  const largura = window.innerWidth - 55;
+  const altura = window.innerHeight - 55;
+  x = Math.max(0, Math.min(x, largura));
+  y = Math.max(0, Math.min(y, altura));
+  
+  balao.style.left = x + 'px';
+  balao.style.bottom = 'auto';
+  balao.style.top = y + 'px';
+}
+
+function pararArrasto() {
+  arrastando = false;
+  balao.classList.remove('arrastando');
+}
+
+// === ABRIR / MINIMIZAR / FECHAR ===
+botao.addEventListener('click', () => {
+  if (!arrastando) jpAlternar();
+});
+
+function jpAlternar() {
+  caixa.classList.toggle('aberta');
+}
+
+function jpMinimizar() {
+  caixa.classList.remove('aberta');
+}
+
+function jpFechar() {
+  balao.style.display = 'none';
+  // Opção: depois de 10s reaparece
+  setTimeout(() => {
+    balao.style.display = 'block';
+  }, 10000);
+}
+
+// === RESPOSTAS ===
+function jpResponder(opcao) {
+  let texto = '';
+  switch(opcao) {
+    case 1:
+      texto = `✅ No Kit você recebe:
+• Planilha de Quantitativo (cálculo automático)
+• Orçamento completo: materiais + mão de obra + deslocamento
+• Modelo de Contrato pronto e editável
+• Tabela de preços de Pinus tratado já atualizada`;
+      break;
+    case 2:
+      texto = `💰 Valores e pagamento:
+• Preço normal: R$ 47,00
+• Cupom UNIÃO05 → R$ 19,90
+• Pagamento via PIX
+• Dinheiro cai na conta na hora ✅`;
+      break;
+    case 3:
+      texto = `📩 Após o pagamento:
+1. Digite seu e-mail
+2. Clique em "Já Paguei"
+3. Recebe o link direto no e-mail 📥`;
+      break;
+    case 4:
+      texto = `📂 Compatibilidade:
+• Abre no Excel, Google Sheets, LibreOffice
+• Funciona no celular, tablet e computador ✅`;
+      break;
+    case 5:
+      texto = `🔒 Garantia:
+• Se não funcionar, devolvemos o dinheiro
+• Suporte e atualizações grátis
+• Feito por carpinteiro, pra carpinteiro! 🪵`;
+      break;
+    case 6:
+      texto = `🎓 Mentoria:
+• Como precificar seus serviços com lucro
+• Acompanhamento passo a passo
+• Dúvidas em tempo real
+👉 Fale no WhatsApp!`;
+      break;
+    case 7:
+      texto = `🤖 Inteligência Artificial:
+• Automatizar orçamentos e contratos
+• Responder clientes com mais rapidez
+• Economizar tempo no dia a dia
+👉 Te ensino!`;
+      break;
+    case 8:
+      texto = `🌐 Site profissional:
+• Página de vendas igual esta
+• Portfólio e contatos
+• Simples e funcional
+👉 Vamos montar o seu!`;
+      break;
+    case 9:
+      texto = `📊 Planilhas personalizadas:
+• Cálculos do seu jeito
+• Controle de gastos, estoque, agenda
+• Adaptada pra sua rotina
+👉 Me explica o que precisa!`;
+      break;
+    case 10:
+      texto = `💬 Contato direto:
+
+📧 jp05carpinteiro@gmail.com
+
+📱 WhatsApp:`;
+      break;
+  }
+
+  const div = document.createElement('div');
+  div.className = 'jp-resp';
+  div.innerHTML = texto;
+  if (opcao === 10) {
+    div.innerHTML += `<a href="https://wa.me/message/WVAK3QG3JPZYM1" target="_blank" class="jp-link-whats">💬 Abrir WhatsApp</a>`;
+  }
+  conteudo.appendChild(div);
+  conteudo.scrollTop = conteudo.scrollHeight;
+}
+</script>
+<!-- ============== FIM ============== -->
+  
 </body>
 </html>
