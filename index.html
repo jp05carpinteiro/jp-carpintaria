@@ -1051,97 +1051,315 @@ function jpMinimizar() {
   caixa.classList.remove('aberta');
 }
 
-function jpFechar() {
-  balao.style.display = 'none';
-  // Opção: depois de 10s reaparece
-  setTimeout(() => {
-    balao.style.display = 'block';
-  }, 10000);
+<!-- ======================================================
+   BALÃO JP CARPINTARIA — MARTELO COM SOM
+   Computador: seta vira martelo, bate e faz som
+   Celular: tocou → aparece batida + som no ponto
+====================================================== -->
+<style>
+  /* === ESTILOS GERAIS === */
+  * { cursor: default; }
+
+  .balao-fixo {
+    position: fixed;
+    left: 15px;
+    bottom: 30px;
+    z-index: 999999;
+  }
+
+  /* Botão martelo */
+  .botao-martelo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #facc15, #eab308);
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    transition: transform 0.1s ease;
+  }
+  .botao-martelo:active {
+    transform: rotate(-20deg) translateY(4px);
+  }
+
+  /* Caixa de perguntas */
+  .caixa-chat {
+    display: none;
+    position: absolute;
+    left: 0;
+    bottom: 70px;
+    width: 320px;
+    background: #222;
+    border-radius: 14px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+  .caixa-chat.aberta { display: block; }
+
+  .cabecalho {
+    background: #facc15;
+    padding: 12px 15px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #000;
+  }
+  .fechar-btn {
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    cursor: pointer;
+    color: #000;
+  }
+
+  .conteudo {
+    padding: 15px;
+    color: #fff;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .msg-inicio {
+    background: #333;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .btn-perg {
+    width: 100%;
+    background: #2ecc71;
+    border: none;
+    padding: 11px 12px;
+    margin: 6px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+  .btn-perg:hover { background: #27ae60; }
+  .resposta {
+    background: #1e3a2f;
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin: 8px 0 14px;
+    border-left: 3px solid #2ecc71;
+    line-height: 1.6;
+  }
+  .link-whats {
+    display: inline-block;
+    background: #25d366;
+    color: white !important;
+    padding: 9px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+
+  /* === EFEITO DA BATIDA === */
+  .batida {
+    position: absolute;
+    font-size: 32px;
+    pointer-events: none;
+    z-index: 9999999;
+    animation: bater 0.5s ease-out forwards;
+  }
+  @keyframes bater {
+    0%   { transform: scale(1.5) rotate(0deg); opacity: 1; }
+    50%  { transform: scale(1) rotate(-15deg); opacity: 1; }
+    100% { transform: scale(0.8) rotate(0deg); opacity: 0; }
+  }
+
+  /* === CURSOR MARTELO — SÓ NO COMPUTADOR === */
+  @media (min-width: 769px) {
+    body {
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><text y="24" font-size="24">🔨</text></svg>') 8 24, auto;
+    }
+    .botao-martelo, .btn-perg, .fechar-btn, .link-whats {
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><text y="24" font-size="24">🔨</text></svg>') 8 24, pointer;
+    }
+  }
+</style>
+
+<!-- ESTRUTURA -->
+<div class="balao-fixo">
+  <button class="botao-martelo" id="btnMartelo" onclick="abrirCaixa()">🔨</button>
+
+  <div class="caixa-chat" id="caixaBalao">
+    <div class="cabecalho">
+      JP Carpintaria — Suporte
+      <button class="fechar-btn" onclick="fecharCaixa()">✕</button>
+    </div>
+    <div class="conteudo" id="conteudoBalao">
+      <div class="msg-inicio">
+        Olá! 👋 Tudo bem?<br>
+        💡 Clique nas perguntas abaixo:
+      </div>
+
+      <button class="btn-perg" onclick="mostrarResposta(1)">📋 O que vem no Kit?</button>
+      <button class="btn-perg" onclick="mostrarResposta(2)">💰 Pagamento e cupom</button>
+      <button class="btn-perg" onclick="mostrarResposta(3)">📩 Como recebo o arquivo?</button>
+      <button class="btn-perg" onclick="mostrarResposta(4)">📂 Funciona no Google Sheets?</button>
+      <button class="btn-perg" onclick="mostrarResposta(5)">🔒 Tem garantia?</button>
+      <button class="btn-perg" onclick="mostrarResposta(6)">🎓 Mentoria e IA</button>
+      <button class="btn-perg" onclick="mostrarResposta(7)">💬 Falar direto com JP</button>
+    </div>
+  </div>
+</div>
+
+<!-- ÁREA PARA AS BATIDAS APARECEREM -->
+<div id="areaBatidas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999999;"></div>
+
+<!-- SOM DE MARTELO E COMANDOS -->
+<script>
+// === SOM DA BATIDA ===
+let somMartelo = null;
+let somCarregado = false;
+
+function carregarSom() {
+  if (somCarregado) return;
+  // Som de batida feito com código para funcionar em todo lugar
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+  
+  somMartelo = new AudioContext();
+  somCarregado = true;
+}
+
+function tocarSomBatida() {
+  if (!somCarregado) carregarSom();
+  if (!somMartelo) return;
+  
+  const osc = somMartelo.createOscillator();
+  const gain = somMartelo.createGain();
+  
+  osc.connect(gain);
+  gain.connect(somMartelo.destination);
+  
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(220, somMartelo.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(80, somMartelo.currentTime + 0.08);
+  
+  gain.gain.setValueAtTime(0.35, somMartelo.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, somMartelo.currentTime + 0.12);
+  
+  osc.start(somMartelo.currentTime);
+  osc.stop(somMartelo.currentTime + 0.12);
+}
+
+// === ABRIR E FECHAR CAIXA ===
+function abrirCaixa() {
+  carregarSom();
+  tocarSomBatida();
+  document.getElementById('caixaBalao').classList.add('aberta');
+}
+
+function fecharCaixa() {
+  tocarSomBatida();
+  document.getElementById('caixaBalao').classList.remove('aberta');
+}
+
+// === BATIDA AO CLICAR / TOCAR NA TELA (CELULAR) ===
+document.addEventListener('click', function(e) {
+  criarBatida(e.clientX, e.clientY);
+});
+
+document.addEventListener('touchstart', function(e) {
+  const toque = e.touches[0];
+  criarBatida(toque.clientX, toque.clientY);
+}, { passive: true });
+
+function criarBatida(x, y) {
+  tocarSomBatida();
+  
+  const batida = document.createElement('div');
+  batida.className = 'batida';
+  batida.textContent = '🔨';
+  batida.style.left = (x - 16) + 'px';
+  batida.style.top = (y - 16) + 'px';
+  
+  document.getElementById('areaBatidas').appendChild(batida);
+  
+  setTimeout(() => batida.remove(), 500);
 }
 
 // === RESPOSTAS ===
-function jpResponder(opcao) {
-  let texto = '';
-  switch(opcao) {
+function mostrarResposta(num) {
+  tocarSomBatida();
+  const conteudo = document.getElementById('conteudoBalao');
+  let html = '';
+
+  switch(num) {
     case 1:
-      texto = `✅ No Kit você recebe:
+      html = `<div class="resposta">
+✅ No Kit você recebe:
 • Planilha de Quantitativo (cálculo automático)
 • Orçamento completo: materiais + mão de obra + deslocamento
 • Modelo de Contrato pronto e editável
-• Tabela de preços de Pinus tratado já atualizada`;
+• Tabela de preços de Pinus tratado já atualizada
+      </div>`;
       break;
     case 2:
-      texto = `💰 Valores e pagamento:
+      html = `<div class="resposta">
+💰 Valores e pagamento:
 • Preço normal: R$ 47,00
 • Cupom UNIÃO05 → R$ 19,90
 • Pagamento via PIX
-• Dinheiro cai na conta na hora ✅`;
+• Dinheiro cai na conta na hora ✅
+      </div>`;
       break;
     case 3:
-      texto = `📩 Após o pagamento:
+      html = `<div class="resposta">
+📩 Após o pagamento:
 1. Digite seu e-mail
 2. Clique em "Já Paguei"
-3. Recebe o link direto no e-mail 📥`;
+3. Recebe o link direto no e-mail 📥
+      </div>`;
       break;
     case 4:
-      texto = `📂 Compatibilidade:
-• Abre no Excel, Google Sheets, LibreOffice
-• Funciona no celular, tablet e computador ✅`;
+      html = `<div class="resposta">
+📂 Compatibilidade:
+• Excel, Google Sheets, LibreOffice
+• Funciona no celular, tablet e computador ✅
+      </div>`;
       break;
     case 5:
-      texto = `🔒 Garantia:
+      html = `<div class="resposta">
+🔒 Garantia total:
 • Se não funcionar, devolvemos o dinheiro
 • Suporte e atualizações grátis
-• Feito por carpinteiro, pra carpinteiro! 🪵`;
+• Feito por carpinteiro, pra carpinteiro! 🪵
+      </div>`;
       break;
     case 6:
-      texto = `🎓 Mentoria:
-• Como precificar seus serviços com lucro
-• Acompanhamento passo a passo
-• Dúvidas em tempo real
-👉 Fale no WhatsApp!`;
+      html = `<div class="resposta">
+🎓 Mentoria + Inteligência Artificial:
+• Aprenda a precificar com lucro
+• Use IA pra automatizar orçamentos e contratos
+• Economize tempo no dia a dia
+👉 Fale comigo no WhatsApp!
+      </div>`;
       break;
     case 7:
-      texto = `🤖 Inteligência Artificial:
-• Automatizar orçamentos e contratos
-• Responder clientes com mais rapidez
-• Economizar tempo no dia a dia
-👉 Te ensino!`;
-      break;
-    case 8:
-      texto = `🌐 Site profissional:
-• Página de vendas igual esta
-• Portfólio e contatos
-• Simples e funcional
-👉 Vamos montar o seu!`;
-      break;
-    case 9:
-      texto = `📊 Planilhas personalizadas:
-• Cálculos do seu jeito
-• Controle de gastos, estoque, agenda
-• Adaptada pra sua rotina
-👉 Me explica o que precisa!`;
-      break;
-    case 10:
-      texto = `💬 Contato direto:
+      html = `<div class="resposta">
+💬 Fale direto comigo:
 
-📧 jp05carpinteiro@gmail.com
+📧 E-mail: jp05carpinteiro@gmail.com
 
-📱 WhatsApp:`;
+📱 WhatsApp (respondo mais rápido!):
+<a href="https://wa.me/message/WVAK3QG3JPZYM1" target="_blank" class="link-whats">💬 Abrir WhatsApp</a>
+      </div>`;
       break;
   }
 
-  const div = document.createElement('div');
-  div.className = 'jp-resp';
-  div.innerHTML = texto;
-  if (opcao === 10) {
-    div.innerHTML += `<a href="https://wa.me/message/WVAK3QG3JPZYM1" target="_blank" class="jp-link-whats">💬 Abrir WhatsApp</a>`;
-  }
-  conteudo.appendChild(div);
+  conteudo.insertAdjacentHTML('beforeend', html);
   conteudo.scrollTop = conteudo.scrollHeight;
 }
 </script>
-<!-- ============== FIM ============== -->
-  
+<!-- ============== FIM DO BALÃO ============== -->
+
 </body>
 </html>
