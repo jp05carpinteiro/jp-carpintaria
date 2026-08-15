@@ -808,5 +808,363 @@
     });
   });
 </script>
+  <!-- BALÃO PREGO + SETA → MARTELO - VERSÃO FINAL -->
+<style>
+  .prego-float {
+    position: fixed;
+    left: 15px;
+    bottom: 30px;
+    z-index: 9999;
+  }
+
+  /* Botão principal */
+  .btn-prego {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: #facc15;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Ícone do prego */
+  .prego-icone {
+    font-size: 28px;
+    display: block;
+    transition: transform 0.35s ease-in-out;
+  }
+
+  /* Animação prego entrando */
+  .btn-prego.bater .prego-icone {
+    animation: pregoEntrar 0.4s ease-in-out;
+  }
+
+  @keyframes pregoEntrar {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+    100% { transform: translateY(0); }
+  }
+
+  /* Área da seta/martelo */
+  .indicador {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .seta-icone {
+    font-size: 24px;
+    transition: opacity 0.2s;
+  }
+
+  .martelo-icone {
+    font-size: 28px;
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .martelo-icone.batendo {
+    animation: marteloBate 0.4s ease-in-out;
+  }
+
+  @keyframes marteloBate {
+    0% { transform: rotate(0deg); }
+    30% { transform: rotate(-40deg) translateY(-5px); }
+    60% { transform: rotate(10deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  /* === COMPUTADOR === */
+  @media (min-width: 769px) {
+    .prego-float:hover .seta-icone { opacity: 0; }
+    .prego-float:hover .martelo-icone { opacity: 1; }
+  }
+
+  /* === CELULAR === */
+  @media (max-width: 768px) {
+    .prego-float.ativo .seta-icone { opacity: 0; }
+    .prego-float.ativo .martelo-icone { opacity: 1; }
+  }
+
+  /* Caixa do balão */
+  .caixa-duvidas {
+    position: absolute;
+    left: 0;
+    bottom: 65px;
+    width: 320px;
+    max-width: calc(100vw - 30px);
+    background: #222;
+    border-radius: 14px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+    display: none;
+    overflow: hidden;
+  }
+  .caixa-duvidas.aberta { display: block; }
+
+  .cabecalho-duvidas {
+    background: #facc15;
+    color: #000;
+    padding: 12px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .fechar-duvidas {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #000;
+  }
+
+  .corpo-duvidas {
+    padding: 15px;
+    max-height: 420px;
+    overflow-y: auto;
+    color: #fff;
+  }
+
+  .msg-jp {
+    background: #333;
+    padding: 10px 14px;
+    border-radius: 12px 12px 12px 4px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .btn-pergunta {
+    width: 100%;
+    text-align: left;
+    background: #2ecc71;
+    color: #000;
+    border: none;
+    padding: 10px 12px;
+    margin: 6px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+  }
+  .btn-pergunta:hover { background: #27ae60; }
+
+  .resposta {
+    background: #1e3a2f;
+    padding: 10px 14px;
+    border-radius: 12px 12px 4px 12px;
+    margin: 8px 0 14px;
+    font-size: 14px;
+    border-left: 3px solid #2ecc71;
+    line-height: 1.6;
+  }
+
+  .link-whatsapp {
+    display: inline-block;
+    background: #25d366;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 8px;
+  }
+</style>
+
+<div class="prego-float" id="containerPrego">
+  <button class="btn-prego" id="btnPrego">
+    <span class="prego-icone">📌</span>
+    <div class="indicador">
+      <span class="seta-icone">👉</span>
+      <span class="martelo-icone" id="marteloIcone">🔨</span>
+    </div>
+  </button>
+
+  <div class="caixa-duvidas" id="caixaDuvidas">
+    <div class="cabecalho-duvidas">
+      JP Carpintaria — Suporte
+      <button class="fechar-duvidas" onclick="alternarDuvidas()">✕</button>
+    </div>
+    <div class="corpo-duvidas" id="corpoDuvidas">
+      <div class="msg-jp">
+        Olá! 👋 Em que posso te ajudar?
+      </div>
+
+      <button class="btn-pergunta" onclick="responder(1)">📋 O que vem incluso no Kit?</button>
+      <button class="btn-pergunta" onclick="responder(2)">💰 Como funciona o pagamento?</button>
+      <button class="btn-pergunta" onclick="responder(3)">📩 Como recebo a planilha?</button>
+      <button class="btn-pergunta" onclick="responder(4)">📂 Funciona no Google Sheets?</button>
+      <button class="btn-pergunta" onclick="responder(5)">🔒 Tem garantia?</button>
+      <button class="btn-pergunta" onclick="responder(6)">🎓 Mentoria e Acompanhamento</button>
+      <button class="btn-pergunta" onclick="responder(7)">🤖 Ajuda com Inteligência Artificial</button>
+      <button class="btn-pergunta" onclick="responder(8)">🌐 Criar site profissional</button>
+      <button class="btn-pergunta" onclick="responder(9)">📊 Desenvolver planilhas personalizadas</button>
+      <button class="btn-pergunta" onclick="responder(10)">💬 Falar direto com JP</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const somMartelo = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-hammer-on-wood-1351.mp3');
+somMartelo.volume = 0.5;
+
+const container = document.getElementById('containerPrego');
+const btnPrego = document.getElementById('btnPrego');
+const marteloIcone = document.getElementById('marteloIcone');
+const caixa = document.getElementById('caixaDuvidas');
+
+function acaoBater() {
+  // Toca som
+  somMartelo.currentTime = 0;
+  somMartelo.play().catch(() => {});
+
+  // Animação do martelo
+  marteloIcone.classList.remove('batendo');
+  void marteloIcone.offsetWidth;
+  marteloIcone.classList.add('batendo');
+
+  // Prego entra
+  btnPrego.classList.remove('bater');
+  void btnPrego.offsetWidth;
+  btnPrego.classList.add('bater');
+
+  // Celular: mostra martelo
+  container.classList.add('ativo');
+
+  // Abre balão
+  setTimeout(() => caixa.classList.add('aberta'), 250);
+}
+
+function alternarDuvidas() {
+  caixa.classList.toggle('aberta');
+  if (!caixa.classList.contains('aberta')) {
+    container.classList.remove('ativo');
+  }
+}
+
+// Clique
+btnPrego.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (!caixa.classList.contains('aberta')) acaoBater();
+  else alternarDuvidas();
+});
+
+// Toque no celular
+btnPrego.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  if (!caixa.classList.contains('aberta')) acaoBater();
+  else alternarDuvidas();
+});
+
+// Respostas
+function responder(numero) {
+  const corpo = document.getElementById('corpoDuvidas');
+  let texto = '';
+
+  switch(numero) {
+    case 1:
+      texto = `✅ Vem tudo isso:
+• Planilha de Quantitativo (cálculo automático)
+• Orçamento completo (materiais + mão de obra + deslocamento)
+• Modelo de Contrato pronto e editável
+• Tabela de preços de Pinus tratado já inclusa`;
+      break;
+    case 2:
+      texto = `💳 Pagamento só via PIX:
+• Escaneia o QR Code ou copia a chave
+• Confirma o valor: R$ 47,00
+• Com cupom UNIÃO05 → R$ 19,90
+• Dinheiro cai direto na conta na hora ✅
+• É seguro e rápido!`;
+      break;
+    case 3:
+      texto = `📩 Assim que pagar:
+1. Digita seu e-mail
+2. Clica em "Já Paguei"
+3. Recebe o link da planilha direto no e-mail 📥
+• Pode baixar e usar no mesmo instante!`;
+      break;
+    case 4:
+      texto = `📂 Sim! Funciona perfeitamente:
+• Arquivo .xlsx → Excel, Google Sheets, LibreOffice
+• Celular, tablet ou computador
+• Todas as fórmulas funcionam no Google Sheets ✅`;
+      break;
+    case 5:
+      texto = `🔒 Garantia total:
+• Se não funcionar, devolvemos seu dinheiro
+• Suporte para dúvidas de uso
+• Atualizações gratuitas quando melhorias
+• Feito por carpinteiro, pra carpinteiro! 🪵`;
+      break;
+    case 6:
+      texto = `🎓 Mentoria e Acompanhamento:
+Quer aprender a fazer orçamentos profissionais e crescer na profissão?
+• Acompanhamento passo a passo
+• Como precificar seus serviços
+• Técnicas que uso na prática
+• Tirar dúvidas em tempo real
+👉 Fale comigo no WhatsApp!`;
+      break;
+    case 7:
+      texto = `🤖 Ajuda com Inteligência Artificial:
+Quer usar IA pra te ajudar no dia a dia?
+• Criar e organizar orçamentos
+• Responder clientes e redigir contratos
+• Ideias de projetos e cálculos
+• Automatizar tarefas repetitivas
+👉 Te ensino passo a passo! Chama no WhatsApp.`;
+      break;
+    case 8:
+      texto = `🌐 Criar site profissional:
+Sua presença digital é o seu cartão de visitas!
+• Site de vendas igual a este
+• Apresentação de seus serviços
+• Divulgação de portfólio/fotos de obras
+• Receber pedidos e contatos
+• Tudo simples e funcional
+👉 Vamos montar o seu!`;
+      break;
+    case 9:
+      texto = `📊 Planilhas personalizadas:
+Precisa de algo específico?
+• Planilhas com seus próprios preços
+• Cálculos automatizados pra sua rotina
+• Controle de gastos, estoque, agendamentos
+• Adaptada exatamente pro seu trabalho
+👉 Me explica o que precisa que eu crio!`;
+      break;
+    case 10:
+      texto = `💬 Fale direto comigo:
+📱 WhatsApp:
+Aqui eu respondo mais rápido!
+👇`;
+      break;
+  }
+
+  const div = document.createElement('div');
+  div.className = 'resposta';
+  div.innerHTML = texto;
+
+  if (numero === 10) {
+    div.innerHTML += `<a href="https://wa.me/message/WVAK3QG3JPZYM1" target="_blank" class="link-whatsapp">💬 Abrir WhatsApp</a>`;
+  }
+
+  corpo.appendChild(div);
+  corpo.scrollTop = corpo.scrollHeight;
+}
+</script>
+<!-- FIM -->
+  
 </body>
 </html>
