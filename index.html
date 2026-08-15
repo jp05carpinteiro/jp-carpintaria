@@ -1265,101 +1265,204 @@ function fecharCaixa() {
 // === BATIDA AO CLICAR / TOCAR NA TELA (CELULAR) ===
 document.addEventListener('click', function(e) {
   criarBatida(e.clientX, e.clientY);
-});
+<!-- BALÃO MARTELO JP — FUNCIONANDO GARANTIDO -->
+<style>
+/* Cursor martelo só no computador */
+@media (min-width: 768px) {
+  * { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><text y="20" font-size="22">🔨</text></svg>') 4 20, auto !important; }
+  button, a { cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><text y="20" font-size="22">🔨</text></svg>') 4 20, pointer !important; }
+}
 
-document.addEventListener('touchstart', function(e) {
-  const toque = e.touches[0];
-  criarBatida(toque.clientX, toque.clientY);
-}, { passive: true });
+.balao-fixo {
+  position: fixed !important;
+  left: 15px !important;
+  bottom: 30px !important;
+  z-index: 999999 !important;
+}
+
+.botao-martelo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #facc15;
+  border: none;
+  font-size: 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+}
+
+.caixa-chat {
+  display: none;
+  position: absolute;
+  left: 0;
+  bottom: 70px;
+  width: 320px;
+  background: #222;
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+.caixa-chat.aberta { display: block !important; }
+
+.topo {
+  background: #facc15;
+  padding: 12px 15px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  color: #000;
+}
+.fechar { border: none; background: none; font-size: 18px; cursor: pointer; }
+
+.corpo { padding: 15px; color: #fff; max-height: 400px; overflow-y: auto; }
+.msg-inicio { background: #333; padding: 12px; border-radius: 10px; margin-bottom: 12px; }
+.btn-perg {
+  width: 100%;
+  background: #2ecc71;
+  border: none;
+  padding: 11px;
+  margin: 6px 0;
+  border-radius: 8px;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+}
+.resposta {
+  background: #1e3a2f;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 8px 0 14px;
+  border-left: 3px solid #2ecc71;
+  line-height: 1.6;
+}
+.link-whats {
+  display: inline-block;
+  background: #25d366;
+  color: white;
+  padding: 9px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-top: 8px;
+}
+
+.batida {
+  position: absolute;
+  font-size: 32px;
+  pointer-events: none;
+  animation: bater 0.5s ease-out forwards;
+}
+@keyframes bater {
+  0% { transform: scale(1.5); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0; }
+}
+</style>
+
+<div class="balao-fixo">
+  <button class="botao-martelo" id="btnMartelo" onclick="abrirBalao()">🔨</button>
+
+  <div class="caixa-chat" id="caixaBalao">
+    <div class="topo">
+      JP Carpintaria
+      <button class="fechar" onclick="fecharBalao()">✕</button>
+    </div>
+    <div class="corpo" id="corpoBalao">
+      <div class="msg-inicio">
+        Olá! 👋 Em que posso te ajudar?
+      </div>
+
+      <button class="btn-perg" onclick="responder(1)">📋 O que vem no Kit?</button>
+      <button class="btn-perg" onclick="responder(2)">💰 Valores e cupom</button>
+      <button class="btn-perg" onclick="responder(3)">📩 Como recebo o arquivo?</button>
+      <button class="btn-perg" onclick="responder(4)">📂 Funciona no Google Sheets?</button>
+      <button class="btn-perg" onclick="responder(5)">🔒 Tem garantia?</button>
+      <button class="btn-perg" onclick="responder(6)">🎓 Mentoria e IA</button>
+      <button class="btn-perg" onclick="responder(7)">💬 Falar direto com JP</button>
+    </div>
+  </div>
+</div>
+
+<div id="areaBatidas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999999;"></div>
+
+<script>
+// SOM DE BATIDA
+let ctx = null;
+function somBatida() {
+  if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o.type = 'triangle';
+  o.frequency.setValueAtTime(220, ctx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.08);
+  g.gain.setValueAtTime(0.35, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+  o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.12);
+}
+
+function abrirBalao() {
+  somBatida();
+  document.getElementById('caixaBalao').classList.add('aberta');
+}
+function fecharBalao() {
+  somBatida();
+  document.getElementById('caixaBalao').classList.remove('aberta');
+}
+
+// Batida visual ao clicar/tocar
+document.addEventListener('click', e => criarBatida(e.clientX, e.clientY));
+document.addEventListener('touchstart', e => {
+  const t = e.touches[0];
+  criarBatida(t.clientX, t.clientY);
+}, {passive:true});
 
 function criarBatida(x, y) {
-  tocarSomBatida();
-  
-  const batida = document.createElement('div');
-  batida.className = 'batida';
-  batida.textContent = '🔨';
-  batida.style.left = (x - 16) + 'px';
-  batida.style.top = (y - 16) + 'px';
-  
-  document.getElementById('areaBatidas').appendChild(batida);
-  
-  setTimeout(() => batida.remove(), 500);
+  somBatida();
+  const b = document.createElement('div');
+  b.className = 'batida';
+  b.textContent = '🔨';
+  b.style.left = (x - 16) + 'px';
+  b.style.top = (y - 16) + 'px';
+  document.getElementById('areaBatidas').appendChild(b);
+  setTimeout(() => b.remove(), 500);
 }
 
-// === RESPOSTAS ===
-function mostrarResposta(num) {
-  tocarSomBatida();
-  const conteudo = document.getElementById('conteudoBalao');
-  let html = '';
-
-  switch(num) {
-    case 1:
-      html = `<div class="resposta">
-✅ No Kit você recebe:
-• Planilha de Quantitativo (cálculo automático)
-• Orçamento completo: materiais + mão de obra + deslocamento
-• Modelo de Contrato pronto e editável
-• Tabela de preços de Pinus tratado já atualizada
-      </div>`;
-      break;
-    case 2:
-      html = `<div class="resposta">
-💰 Valores e pagamento:
-• Preço normal: R$ 47,00
-• Cupom UNIÃO05 → R$ 19,90
-• Pagamento via PIX
-• Dinheiro cai na conta na hora ✅
-      </div>`;
-      break;
-    case 3:
-      html = `<div class="resposta">
-📩 Após o pagamento:
+function responder(n) {
+  somBatida();
+  const c = document.getElementById('corpoBalao');
+  let txt = '';
+  if (n===1) txt = `✅ Kit:
+• Planilha Quantitativo (cálculo automático)
+• Orçamento completo
+• Contrato pronto e editável
+• Tabela de preços de Pinus`;
+  if (n===2) txt = `💰 Valores:
+• Normal: R$ 47,00
+• Pagamento via PIX OU LINK`;
+  if (n===3) txt = `📩 Após pagar:
 1. Digite seu e-mail
-2. Clique em "Já Paguei"
-3. Recebe o link direto no e-mail 📥
-      </div>`;
-      break;
-    case 4:
-      html = `<div class="resposta">
-📂 Compatibilidade:
+2. Clique "Já Paguei"
+3. Recebe o link no e-mail 📥`;
+  if (n===4) txt = `📂 Funciona no:
 • Excel, Google Sheets, LibreOffice
-• Funciona no celular, tablet e computador ✅
-      </div>`;
-      break;
-    case 5:
-      html = `<div class="resposta">
-🔒 Garantia total:
-• Se não funcionar, devolvemos o dinheiro
+• Celular, tablet e computador ✅`;
+  if (n===5) txt = `🔒 Garantia:
+• Devolução se não funcionar
 • Suporte e atualizações grátis
-• Feito por carpinteiro, pra carpinteiro! 🪵
-      </div>`;
-      break;
-    case 6:
-      html = `<div class="resposta">
-🎓 Mentoria + Inteligência Artificial:
+• Feito por carpinteiro, pra carpinteiro! 🪵`;
+  if (n===6) txt = `🎓 Mentoria + IA:
 • Aprenda a precificar com lucro
-• Use IA pra automatizar orçamentos e contratos
-• Economize tempo no dia a dia
-👉 Fale comigo no WhatsApp!
-      </div>`;
-      break;
-    case 7:
-      html = `<div class="resposta">
-💬 Fale direto comigo:
+• Use IA pra automatizar orçamentos
+👉 Fale no WhatsApp!`;
+  if (n===7) txt = `💬 Contato:
+📧 jp05carpinteiro@gmail.com
+📱 WhatsApp:
+<a href="https://wa.me/message/WVAK3QG3JPZYM1" target="_blank" class="link-whats">Abrir WhatsApp</a>`;
 
-📧 E-mail: jp05carpinteiro@gmail.com
-
-📱 WhatsApp (respondo mais rápido!):
-<a href="https://wa.me/message/WVAK3QG3JPZYM1" target="_blank" class="link-whats">💬 Abrir WhatsApp</a>
-      </div>`;
-      break;
-  }
-
-  conteudo.insertAdjacentHTML('beforeend', html);
-  conteudo.scrollTop = conteudo.scrollHeight;
+  c.insertAdjacentHTML('beforeend', `<div class="resposta">${txt}</div>`);
+  c.scrollTop = c.scrollHeight;
 }
 </script>
-<!-- ============== FIM DO BALÃO ============== -->
+<!-- FIM DO BALÃO -->
+  
 
 </body>
 </html>
