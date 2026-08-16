@@ -459,6 +459,140 @@
     padding:7px 13px;
     border-radius:20px;
   }
+  /* ===== CONDIÇÕES DE PAGAMENTO — versão organizada ===== */
+  .payment-intro{
+    margin-top:16px;
+    color:#5a4420;
+    font-size:15.5px;
+    max-width:650px;
+  }
+  .payment-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+    margin-top:26px;
+  }
+  .payment-card{
+    background:rgba(255,255,255,0.16);
+    border:1px solid rgba(28,23,18,0.20);
+    border-radius:8px;
+    padding:16px 18px;
+  }
+  .payment-card strong{
+    display:block;
+    font-family:'Fraunces',serif;
+    font-size:18px;
+    color:var(--pine-2);
+    margin-bottom:5px;
+  }
+  .payment-card span{
+    display:block;
+    color:#5a4420;
+    font-size:13.5px;
+    line-height:1.5;
+  }
+  .payment-card.featured{
+    grid-column:1/-1;
+    background:rgba(28,23,18,0.10);
+    border:2px solid rgba(28,23,18,0.30);
+  }
+  .payment-card.featured strong{font-size:20px;}
+  .payment-note{
+    margin-top:16px;
+    padding:14px 16px;
+    border-left:4px solid var(--pine-2);
+    background:rgba(28,23,18,0.08);
+    color:#4d3a1d;
+    font-size:13.5px;
+    line-height:1.55;
+  }
+  @media (max-width:700px){
+    .payment-grid{grid-template-columns:1fr;}
+    .payment-card.featured{grid-column:auto;}
+  }
+
+  /* ===== ÁREA DE ATENDIMENTO ===== */
+  .service-area-strip{
+    background:var(--pine-2);
+    color:var(--cream);
+    border-top:1px solid var(--line-light);
+    border-bottom:1px solid var(--line-light);
+  }
+  .service-area-inner{
+    min-height:74px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:18px 28px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+  }
+  .service-area-inner b{color:var(--gold); margin-left:7px;}
+
+  /* ===== MAPA ===== */
+  .location-section{
+    background:var(--cream-2);
+    padding:90px 0;
+  }
+  .location-grid{
+    display:grid;
+    grid-template-columns:.85fr 1.4fr;
+    gap:44px;
+    align-items:stretch;
+  }
+  .location-copy{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  .location-copy h2{
+    font-size:clamp(30px,4vw,44px);
+    line-height:1.08;
+    margin-top:16px;
+  }
+  .location-copy p{
+    margin-top:18px;
+    color:#4a4237;
+    max-width:480px;
+  }
+  .location-badge{
+    margin-top:24px;
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    width:max-content;
+    max-width:100%;
+    padding:10px 14px;
+    border:1px solid rgba(28,23,18,.2);
+    border-radius:4px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+  }
+  .map-frame{
+    min-height:380px;
+    border-radius:6px;
+    overflow:hidden;
+    box-shadow:0 20px 45px -20px rgba(28,23,18,.35);
+    border:1px solid rgba(28,23,18,.18);
+    background:#ddd;
+  }
+  .map-frame iframe{
+    width:100%;
+    height:100%;
+    min-height:380px;
+    border:0;
+    display:block;
+  }
+  @media (max-width:860px){
+    .location-grid{grid-template-columns:1fr;}
+    .map-frame,.map-frame iframe{min-height:320px;}
+  }
+
   .cta-box{
     background:var(--char);
     color:var(--cream);
@@ -536,6 +670,7 @@
       <a href="#projetos">Projetos</a>
       <a href="#processo">Como funciona</a>
       <a href="#contato">Contato</a>
+      <a href="#localizacao">Localização</a>
       <a href="Mentoria.html">Mentoria</a>
     </div>
     <a class="nav-cta" href="https://wa.me/5548991520331" target="_blank" rel="noopener">Falar no WhatsApp</a>
@@ -557,9 +692,16 @@
     <div class="hero-stat"><b>+5.000</b><span>Seguidores acompanham a obra</span></div>
     <div class="hero-stat"><b>6</b><span>Frentes de trabalho em madeira</span></div>
     <div class="hero-stat"><b>18x</b><span>Parcelamento disponível</span></div>
-    <div class="hero-stat"><b>SC</b><span>Atendimento em Tubarão e região</span></div>
+    <div class="hero-stat"><b>SC</b><span>Atendemos o Litoral e a Região Serrana</span></div>
   </div>
 </section>
+
+<!-- ÁREA DE ATENDIMENTO -->
+<div class="service-area-strip">
+  <div class="service-area-inner">
+    Área de atendimento: <b>Litoral e Região Serrana de Santa Catarina</b> · Base em Tubarão/SC
+  </div>
+</div>
 
 <div class="ruler">
   <div class="ruler-marks">
@@ -704,22 +846,64 @@
 <section class="cta-section">
   <div class="wrap cta-grid">
     <div class="reveal">
-      <div class="eyebrow" style="color:#5a4420;">Condições</div>
-      <h2>Facilidade para tirar o projeto do papel</h2>
-      <p>Parcelamos em até 18x com juros da máquina. Neste mês, condição especial: até 10x sem juros. Financiamento também disponível conforme a situação do cliente.</p>
-      <div class="pay-list">
-        <span class="pay-chip">PIX</span>
-        <span class="pay-chip">Dinheiro</span>
-        <span class="pay-chip">Cartão em até 18x</span>
-        <span class="pay-chip">Até 10x sem juros (mês vigente)</span>
-        <span class="pay-chip">Financiamento sob análise</span>
+      <div class="eyebrow" style="color:#5a4420;">Condições de pagamento</div>
+      <h2>Facilidade para tirar seu projeto do papel</h2>
+      <p class="payment-intro">Escolha a forma de pagamento que melhor se encaixa no seu projeto. Trabalhamos com opções à vista, cartão e também <strong>financiamento mediante avaliação</strong>.</p>
+
+      <div class="payment-grid">
+        <div class="payment-card">
+          <strong>PIX</strong>
+          <span>Pagamento à vista por PIX, conforme as condições definidas no orçamento e contrato.</span>
+        </div>
+        <div class="payment-card">
+          <strong>Dinheiro</strong>
+          <span>Pagamento à vista em dinheiro, conforme as condições combinadas para o serviço.</span>
+        </div>
+        <div class="payment-card">
+          <strong>Cartão de crédito</strong>
+          <span>Parcelamento em até <strong>18x</strong>, com juros da máquina conforme a quantidade de parcelas escolhida.</span>
+        </div>
+        <div class="payment-card">
+          <strong>Condição especial</strong>
+          <span><strong>Até 10x sem juros</strong> no mês vigente, conforme a condição promocional informada no orçamento.</span>
+        </div>
+        <div class="payment-card featured">
+          <strong>Financiamento — mediante avaliação</strong>
+          <span><strong>Sim, podemos trabalhar com financiamento.</strong> A contratação está sujeita à avaliação individual de cada cliente e à análise de crédito/documentação e demais condições aplicáveis. A aprovação não é automática: o valor liberado, prazo, entrada, taxas e demais condições dependem da análise e aprovação. Consulte a JP Carpintaria para fazer sua avaliação e verificar as possibilidades para o seu projeto.</span>
+        </div>
+      </div>
+
+      <div class="payment-note">
+        <strong>Importante:</strong> as condições finais de pagamento, parcelamento e financiamento são definidas antes do início da obra e registradas no orçamento/contrato. Consulte a equipe para saber a condição disponível para o seu projeto.
       </div>
     </div>
+
     <div class="cta-box reveal">
       <div class="eyebrow">Fale direto com Josias</div>
       <h3>Peça seu orçamento agora</h3>
       <p>Atendimento de segunda a sexta, das 7h às 18h. Resposta rápida pelo WhatsApp.</p>
       <a class="btn btn-primary" href="https://wa.me/5548991520331" target="_blank" rel="noopener">(48) 99152-0331 · Chamar no WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- LOCALIZAÇÃO -->
+<section class="location-section" id="localizacao">
+  <div class="wrap location-grid">
+    <div class="location-copy reveal">
+      <div class="eyebrow">Onde estamos</div>
+      <h2>JP Carpintaria em Tubarão, SC</h2>
+      <p>Estamos em <strong>Tubarão, Santa Catarina</strong>, com atendimento para projetos no Litoral e na Região Serrana de SC.</p>
+      <div class="location-badge">📍 Tubarão · Santa Catarina · Brasil</div>
+      <p style="font-size:13px; margin-top:14px;">O mapa abaixo usa a busca por “JP Carpintaria, Tubarão, SC”. Se você tiver um endereço comercial ou um link exato do Google Maps, podemos deixar o pino preciso.</p>
+    </div>
+    <div class="map-frame reveal">
+      <iframe
+        src="https://www.google.com/maps?q=JP%20Carpintaria%2C%20Tubar%C3%A3o%2C%20SC&output=embed"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        title="Mapa da JP Carpintaria em Tubarão, Santa Catarina">
+      </iframe>
     </div>
   </div>
 </section>
@@ -759,7 +943,8 @@
             </a>
           </li>
           <li style="margin-bottom: 10px;">jp05carpinteiro@gmail.com</li>
-          <li>Tubarão — Santa Catarina</li>
+          <li>📍 Tubarão — Santa Catarina</li>
+          <li style="margin-top:10px; color:#D6A23C; font-weight:600;">Atendimento: Litoral e Região Serrana de SC</li>
         </ul>
       </div>
 
@@ -782,7 +967,7 @@
 
     <div class="foot-bottom">
       <span>© 2018 JP Carpintaria — Josias Peirão de Souza</span>
-      <span>Projetos em madeira · Tubarão, SC</span>
+      <span>Projetos em madeira · Tubarão, SC · Litoral e Serra</span>
     </div>
   </div>
 </footer>
